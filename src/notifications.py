@@ -12,6 +12,7 @@ def send_next_launch_message():
     launch = launches.get_next_launch()
 
     if launch == 0:
+        print('Unable to fetch launch')
         return False
 
     try:
@@ -23,11 +24,13 @@ def send_next_launch_message():
 
         # The notification should only trigger when less than 1 hour is left until takeoff
         if seconds_left <= 0 or seconds_left > 3600:
+            # print('DEBUG: No launch within the next hour')
             return False
 
         # Check whether the notification for this flight has already been sent
         latest_flight_sent = storage.get_latest_flight_sent()
         if latest_flight_sent == flight_number:
+            # print('DEBUG: Message has already been sent')
             return False
 
         minutes = int(seconds_left / 60)
@@ -35,5 +38,8 @@ def send_next_launch_message():
 
         if message_sent:
             storage.set_latest_flight_sent(flight_number)
+        else:
+            print('Sending the cloud message failed')
     except:
+        print('An exception occured on send_next_launch_message')
         return False
